@@ -34,7 +34,6 @@ public class MainFrame extends FrameOption {
         gbc.gridx = 2;
         frame.add(closeButton, gbc);
 
-        // Akcje przycisków z funkcjami anonimowymi
         addButton.addActionListener(e -> new AddMeasureFrame().show());
         viewButton.addActionListener(e -> new GetMeasureFrame().show());
         closeButton.addActionListener(e -> frame.dispose());
@@ -45,6 +44,6 @@ public class MainFrame extends FrameOption {
 
     @Override
     protected void show() {
-
+        frame.setVisible(true);
     }
 }

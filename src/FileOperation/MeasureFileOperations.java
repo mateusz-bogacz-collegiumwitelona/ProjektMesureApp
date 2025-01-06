@@ -13,7 +13,7 @@ public class MeasureFileOperations implements MeasureOperations {
     private final String filePath = "measure.csv";
 
     @Override
-    public void saveMeasure(String systolic, String diastolic, String pulse) throws IOException {
+    public synchronized void saveMeasure(String systolic, String diastolic, String pulse) throws IOException {
         File file = new File(filePath);
         boolean isNewFile = file.createNewFile();
 
@@ -27,7 +27,7 @@ public class MeasureFileOperations implements MeasureOperations {
     }
 
     @Override
-    public List<String[]> loadMeasures() throws IOException {
+    public synchronized List<String[]> loadMeasures() throws IOException {
         List<String[]> measures = new ArrayList<>();
         if (!Files.exists(Paths.get(filePath))) {
             return measures;

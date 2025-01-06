@@ -16,7 +16,7 @@ import java.util.List;
 
 
 
-class BloodPressureApp extends MainFrame {
+public class Main extends MainFrame {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(MainFrame::new);
     }

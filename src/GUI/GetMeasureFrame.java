@@ -50,4 +50,9 @@ class GetMeasureFrame extends FrameOption {
         frame.pack();
         frame.setVisible(true);
     }
+
+    @Override
+    protected void show() {
+        frame.setVisible(true);
+    }
 }

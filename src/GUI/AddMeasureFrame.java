@@ -67,8 +67,26 @@ class AddMeasureFrame extends FrameOption {
     }
 
     private void saveMeasure() {
+        String systolic = systolicField.getText();
+        String diastolic = diastolicField.getText();
+        String pulse = pulseField.getText();
+
+        if (systolic.isEmpty() || diastolic.isEmpty() || pulse.isEmpty()) {
+            JOptionPane.showMessageDialog(frame, "Wszystkie pola muszą być wypełnione", "Błąd", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
         try {
-            operations.saveMeasure(systolicField.getText(), diastolicField.getText(), pulseField.getText());
+            Integer.parseInt(systolic);
+            Integer.parseInt(diastolic);
+            Integer.parseInt(pulse);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(frame, "Podane wartości muszą być liczbami", "Błąd", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            operations.saveMeasure(systolic, diastolic, pulse);
             JOptionPane.showMessageDialog(frame, "Pomiar zapisany!", "Sukces", JOptionPane.INFORMATION_MESSAGE);
             systolicField.setText("");
             diastolicField.setText("");
@@ -76,5 +94,10 @@ class AddMeasureFrame extends FrameOption {
         } catch (IOException e) {
             JOptionPane.showMessageDialog(frame, "Błąd zapisu: " + e.getMessage(), "Błąd", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    @Override
+    protected void show() {
+        frame.setVisible(true);
     }
 }
