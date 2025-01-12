@@ -1,88 +1,81 @@
 package GUI;
 
-import FileOperation.MeasureFileOperations;
+import FileOperation.CVEStorage;
+import FileOperation.MeasurementStorage;
+import FileOperation.CVEExporter;
+import FileOperation.TXTExporter;
+import Exceptions.FileOperationException;
+
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
+import java.io.File;
 
-class SaveOptionsFrame extends FrameOption {
-    private final MeasureFileOperations operations = new MeasureFileOperations();
-    private final JFileChooser fileChooser = new JFileChooser();
+public class SaveOptionsFrame extends AbstractFrame {
+    private final MeasurementStorage storage;
+    private final JFileChooser fileChooser;
 
     public SaveOptionsFrame() {
         super("Opcje zapisu");
+        this.storage = new CVEStorage();
+        this.fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-        init();
+        initComponents();
+        setupListeners();
     }
 
     @Override
-    public void init() {
+    protected void initComponents() {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        JButton csvButton = new JButton("Zapisz do CVE");
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        frame.add(csvButton, gbc);
-
+        JButton cveButton = new JButton("Zapisz do CVE");
         JButton txtButton = new JButton("Zapisz do TXT");
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        frame.add(txtButton, gbc);
-
         JButton closeButton = new JButton("Zamknij");
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        frame.add(closeButton, gbc);
 
-        csvButton.addActionListener(e -> saveToCVE());
+        addComponent(cveButton, gbc, 0, 0, 1);
+        addComponent(txtButton, gbc, 1, 0, 1);
+        addComponent(closeButton, gbc, 0, 1, 2);
+
+        cveButton.addActionListener(e -> saveToCVE());
         txtButton.addActionListener(e -> saveToTXT());
-        closeButton.addActionListener(e -> frame.dispose());
+        closeButton.addActionListener(e -> close());
+    }
 
-        frame.pack();
+    @Override
+    protected void setupListeners() {
+        // All listeners are set up in initComponents for this frame
     }
 
     private void saveToCVE() {
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setSelectedFile(new File("measure.cve"));
-
         if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
-            if (!file.getName().toLowerCase().endsWith(".cve")) {
-                file = new File(file.getAbsolutePath() + ".cve");
-            }
-
+            File file = ensureExtension(fileChooser.getSelectedFile(), ".cve");
             try {
-                operations.saveToCustomCVE(file);
-                JOptionPane.showMessageDialog(frame, "Dane zostały zapisane do pliku CVE!", "Sukces", JOptionPane.INFORMATION_MESSAGE);
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(frame, "Błąd zapisu do pliku CVE: " + ex.getMessage(), "Błąd", JOptionPane.ERROR_MESSAGE);
+                storage.exportTo(file, new CVEExporter());
+                showSuccess("Dane zostały zapisane do pliku CVE!");
+            } catch (FileOperationException ex) {
+                showError("Błąd zapisu", ex.getMessage());
             }
         }
     }
 
     private void saveToTXT() {
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fileChooser.setSelectedFile(new File("pomiary.txt"));
-
         if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
-            File file = fileChooser.getSelectedFile();
-            if (!file.getName().toLowerCase().endsWith(".txt")) {
-                file = new File(file.getAbsolutePath() + ".txt");
-            }
-
+            File file = ensureExtension(fileChooser.getSelectedFile(), ".txt");
             try {
-                operations.saveToCustomTXT(file);
-                JOptionPane.showMessageDialog(frame, "Dane zostały zapisane do pliku TXT!", "Sukces", JOptionPane.INFORMATION_MESSAGE);
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(frame, "Błąd zapisu do pliku TXT: " + ex.getMessage(), "Błąd", JOptionPane.ERROR_MESSAGE);
+                storage.exportTo(file, new TXTExporter());
+                showSuccess("Dane zostały zapisane do pliku TXT!");
+            } catch (FileOperationException ex) {
+                showError("Błąd zapisu", ex.getMessage());
             }
         }
     }
 
-    @Override
-    protected void show() {
-        frame.setVisible(true);
+    private File ensureExtension(File file, String extension) {
+        if (!file.getName().toLowerCase().endsWith(extension)) {
+            return new File(file.getAbsolutePath() + extension);
+        }
+        return file;
     }
 }

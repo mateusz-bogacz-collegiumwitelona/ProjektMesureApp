@@ -3,52 +3,42 @@ package GUI;
 import javax.swing.*;
 import java.awt.*;
 
-public class MainFrame extends FrameOption {
+public class MainFrame extends AbstractFrame {
+    private JButton addButton;
+    private JButton viewButton;
+    private JButton saveOptionsButton;
+    private JButton closeButton;
+
     public MainFrame() {
         super("Bieda Ciśnienie");
-        init();
+        initComponents();
+        setupListeners();
     }
 
     @Override
-    public void init() {
+    protected void initComponents() {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
 
         JLabel titleLabel = new JLabel("Bieda Ciśnienie");
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 4;
-        frame.add(titleLabel, gbc);
+        addComponent(titleLabel, gbc, 0, 0, 4);
 
-        JButton addButton = new JButton("Dodaj ciśnienie");
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        frame.add(addButton, gbc);
+        addButton = new JButton("Dodaj ciśnienie");
+        viewButton = new JButton("Wczytaj ciśnienie");
+        saveOptionsButton = new JButton("Opcje zapisu");
+        closeButton = new JButton("Zamknij");
 
-        JButton viewButton = new JButton("Wczytaj ciśnienie");
-        gbc.gridx = 1;
-        frame.add(viewButton, gbc);
-
-        JButton saveOptionsButton = new JButton("Opcje zapisu");
-        gbc.gridx = 2;
-        frame.add(saveOptionsButton, gbc);
-
-        JButton closeButton = new JButton("Zamknij");
-        gbc.gridx = 3;
-        frame.add(closeButton, gbc);
-
-        addButton.addActionListener(e -> new AddMeasureFrame().show());
-        viewButton.addActionListener(e -> new GetMeasureFrame().show());
-        saveOptionsButton.addActionListener(e -> new SaveOptionsFrame().show());
-        closeButton.addActionListener(e -> frame.dispose());
-
-        frame.pack();
-        frame.setVisible(true);
+        addComponent(addButton, gbc, 0, 1, 1);
+        addComponent(viewButton, gbc, 1, 1, 1);
+        addComponent(saveOptionsButton, gbc, 2, 1, 1);
+        addComponent(closeButton, gbc, 3, 1, 1);
     }
 
     @Override
-    protected void show() {
-        frame.setVisible(true);
+    protected void setupListeners() {
+        addButton.addActionListener(e -> FrameFactory.createFrame(FrameType.ADD_MEASUREMENT).show());
+        viewButton.addActionListener(e -> FrameFactory.createFrame(FrameType.VIEW_MEASUREMENTS).show());
+        saveOptionsButton.addActionListener(e -> FrameFactory.createFrame(FrameType.SAVE_OPTIONS).show());
+        closeButton.addActionListener(e -> close());
     }
 }
