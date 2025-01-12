@@ -10,70 +10,65 @@ import java.util.List;
 import Measure.*;
 
 public class MeasureFileOperations implements MeasureOperations {
-    private final String csvFilePath = "measure.csv";
+    private final String cveFilePath = "measure.cve";
 
     @Override
     public synchronized void saveMeasure(String systolic, String diastolic, String pulse) throws IOException {
-        saveToCSV(systolic, diastolic, pulse);
+        saveToCVE(systolic, diastolic, pulse);
     }
 
-    private void saveToCSV(String systolic, String diastolic, String pulse) throws IOException {
-        File file = new File(csvFilePath);
-        boolean isNewFile = file.createNewFile();
+    private void saveToCVE(String systolic, String diastolic, String pulse) throws IOException {
+        File file = new File(cveFilePath);
+        boolean isNewFile = !file.exists();
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-            if (isNewFile) {
-                writer.write("Date,Systolic,Diastolic,Pulse\n");
-            }
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
-            writer.write(String.format("%s,%s,%s,%s\n", timestamp, systolic, diastolic, pulse));
+            writer.write(String.format("%s;%s;%s;%s\n", timestamp, systolic, diastolic, pulse));
         }
     }
 
-    public synchronized void synchronizeTxtWithCsv() throws IOException {
-        // Sprawdzanie, czy plik CSV istnieje
-        if (!Files.exists(Paths.get(csvFilePath))) {
-            return;
-        }
-
-        // Czyszczenie lub tworzenie pliku TXT
-        String txtFilePath = "measure.txt";
-        try (BufferedWriter txtWriter = new BufferedWriter(new FileWriter(txtFilePath))) {
-            txtWriter.write("Measure\n");
-            txtWriter.write("=========================\n");
-
-            // Odczytywanie danych z CSV i zapisywanie do TXT
-            try (BufferedReader csvReader = new BufferedReader(new FileReader(csvFilePath))) {
-                csvReader.readLine(); // Pominięcie nagłówka CSV
-                String line;
-                while ((line = csvReader.readLine()) != null) {
-                    String[] parts = line.split(",");
-                    String timestamp = parts[0];
-                    String systolic = parts[1];
-                    String diastolic = parts[2];
-                    String pulse = parts[3];
-
-                    txtWriter.write(String.format("Date: %s\nSystolic: %s\nDiastolic: %s\nPulse: %s\n",
-                            timestamp, systolic, diastolic, pulse));
-                    txtWriter.write("-------------------------\n");
-                }
+    public synchronized void saveToCustomCVE(File file) throws IOException {
+        List<String[]> measures = loadMeasures();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (String[] measure : measures) {
+                writer.write(String.format("%s;%s;%s;%s\n",
+                        measure[0], // data
+                        measure[1], // systolic
+                        measure[2], // diastolic
+                        measure[3]  // pulse
+                ));
             }
         }
     }
 
+    public synchronized void saveToCustomTXT(File file) throws IOException {
+        List<String[]> measures = loadMeasures();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            writer.write("Pomiary ciśnienia\n");
+            writer.write("=================\n\n");
+            for (String[] measure : measures) {
+                writer.write(String.format("Data: %s\nCiśnienie górne: %s\nCiśnienie dolne: %s\nPuls: %s\n",
+                        measure[0], // data
+                        measure[1], // systolic
+                        measure[2], // diastolic
+                        measure[3]  // pulse
+                ));
+                writer.write("-------------------------\n");
+            }
+        }
+    }
 
     @Override
     public synchronized List<String[]> loadMeasures() throws IOException {
         List<String[]> measures = new ArrayList<>();
-        if (!Files.exists(Paths.get(csvFilePath))) {
+        if (!Files.exists(Paths.get(cveFilePath))) {
             return measures;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(csvFilePath))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(cveFilePath))) {
             String line;
-            reader.readLine(); // Skip header
             while ((line = reader.readLine()) != null) {
-                measures.add(line.split(","));
+                measures.add(line.split(";"));
             }
         }
         return measures;

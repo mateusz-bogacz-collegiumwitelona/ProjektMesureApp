@@ -17,7 +17,7 @@ public class MainFrame extends FrameOption {
         JLabel titleLabel = new JLabel("Bieda Ciśnienie");
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 3;
+        gbc.gridwidth = 4;
         frame.add(titleLabel, gbc);
 
         JButton addButton = new JButton("Dodaj ciśnienie");
@@ -30,12 +30,17 @@ public class MainFrame extends FrameOption {
         gbc.gridx = 1;
         frame.add(viewButton, gbc);
 
-        JButton closeButton = new JButton("Zamknij");
+        JButton saveOptionsButton = new JButton("Opcje zapisu");
         gbc.gridx = 2;
+        frame.add(saveOptionsButton, gbc);
+
+        JButton closeButton = new JButton("Zamknij");
+        gbc.gridx = 3;
         frame.add(closeButton, gbc);
 
         addButton.addActionListener(e -> new AddMeasureFrame().show());
         viewButton.addActionListener(e -> new GetMeasureFrame().show());
+        saveOptionsButton.addActionListener(e -> new SaveOptionsFrame().show());
         closeButton.addActionListener(e -> frame.dispose());
 
         frame.pack();

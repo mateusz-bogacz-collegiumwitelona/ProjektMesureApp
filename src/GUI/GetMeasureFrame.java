@@ -22,16 +22,10 @@ class GetMeasureFrame extends FrameOption {
 
     @Override
     public void init() {
-        MeasureFileOperations operations = new MeasureFileOperations();
-        try {
-            operations.synchronizeTxtWithCsv();
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(frame, "Błąd synchronizacji danych: " + e.getMessage(), "Błąd", JOptionPane.ERROR_MESSAGE);
-        }
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
-        
+
         model = new DefaultTableModel(new String[]{"Data", "Górne", "Dolne", "Puls"}, 0);
         JTable table = new JTable(model);
 
