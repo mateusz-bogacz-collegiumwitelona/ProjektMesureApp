@@ -1,8 +1,9 @@
 package GUI;
 
 import Measure.Measurement;
+import Measure.MeasurementBuilder;
 import FileOperation.CVEStorage;
-import FileOperation.MeasurementStorage;
+import Interfaces.MeasurementStorage;
 import Exceptions.*;
 
 import javax.swing.*;
@@ -84,11 +85,19 @@ public class AddMeasurementFrame extends AbstractFrame {
     }
 
     private Measurement createMeasurement() throws ValidationException {
-        return new Measurement.Builder()
-                .withSystolic(Integer.parseInt(systolicField.getText().trim()))
-                .withDiastolic(Integer.parseInt(diastolicField.getText().trim()))
-                .withPulse(Integer.parseInt(pulseField.getText().trim()))
-                .build();
+        try {
+            return new MeasurementBuilder()
+                    .withSystolic(Integer.parseInt(systolicField.getText().trim()))
+                    .withDiastolic(Integer.parseInt(diastolicField.getText().trim()))
+                    .withPulse(Integer.parseInt(pulseField.getText().trim()))
+                    .build();
+        } catch (NumberFormatException e) {
+            throw new ValidationException(
+                    "wartości",
+                    systolicField.getText() + "," + diastolicField.getText() + "," + pulseField.getText(),
+                    "Wszystkie wartości muszą być liczbami"
+            );
+        }
     }
 
     private void clearFields() {

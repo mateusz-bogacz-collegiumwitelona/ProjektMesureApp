@@ -1,18 +1,23 @@
 package Exceptions;
 
-public class ValidationException extends MeasurementException {
-    private final int systolic;
-    private final int diastolic;
-    private final int pulse;
+import java.util.HashMap;
+import java.util.Map;
 
-    public ValidationException(String message, int systolic, int diastolic, int pulse) {
+public class ValidationException extends MeasurementException {
+    private final Map<String, String> invalidFields;
+
+    public ValidationException(String fieldName, String value, String message) {
         super(message);
-        this.systolic = systolic;
-        this.diastolic = diastolic;
-        this.pulse = pulse;
+        this.invalidFields = new HashMap<>();
+        this.invalidFields.put(fieldName, value);
     }
 
-    public int getSystolic() { return systolic; }
-    public int getDiastolic() { return diastolic; }
-    public int getPulse() { return pulse; }
+    public ValidationException(Map<String, String> invalidFields, String message) {
+        super(message);
+        this.invalidFields = new HashMap<>(invalidFields);
+    }
+
+    public Map<String, String> getInvalidFields() {
+        return new HashMap<>(invalidFields);
+    }
 }

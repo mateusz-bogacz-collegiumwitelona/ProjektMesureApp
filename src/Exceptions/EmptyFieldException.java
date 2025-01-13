@@ -1,12 +1,7 @@
 package Exceptions;
 
-public class EmptyFieldException extends MeasurementException {
-    private final String fieldName;
-
+public class EmptyFieldException extends ValidationException {
     public EmptyFieldException(String fieldName) {
-        super("Pole " + fieldName + " nie może być puste");
-        this.fieldName = fieldName;
+        super(fieldName, "", "Pole " + fieldName + " nie może być puste");
     }
-
-    public String getFieldName() { return fieldName; }
 }

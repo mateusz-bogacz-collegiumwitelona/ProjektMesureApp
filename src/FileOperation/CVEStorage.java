@@ -1,6 +1,9 @@
 package FileOperation;
 
+import Interfaces.FileExporter;
+import Interfaces.MeasurementStorage;
 import Measure.Measurement;
+import Measure.MeasurementBuilder;
 import Exceptions.*;
 
 import java.io.*;
@@ -58,7 +61,7 @@ public class CVEStorage implements MeasurementStorage {
             while ((line = reader.readLine()) != null) {
                 try {
                     String[] parts = line.split(DELIMITER);
-                    Measurement measurement = new Measurement.Builder()
+                    Measurement measurement = new MeasurementBuilder()
                             .withTimestamp(LocalDateTime.parse(parts[0], DATE_FORMATTER))
                             .withSystolic(Integer.parseInt(parts[1]))
                             .withDiastolic(Integer.parseInt(parts[2]))
@@ -66,7 +69,6 @@ public class CVEStorage implements MeasurementStorage {
                             .build();
                     measurements.add(measurement);
                 } catch (ValidationException | NumberFormatException | ArrayIndexOutOfBoundsException e) {
-                    // Pomijamy nieprawidłowe pomiary bez wyświetlania komunikatów
                     continue;
                 }
             }

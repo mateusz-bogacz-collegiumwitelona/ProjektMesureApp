@@ -1,24 +1,34 @@
 package FileOperation;
 
 import Exceptions.ValidationException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MeasurementValidator {
     public static void validate(int systolic, int diastolic, int pulse) throws ValidationException {
-        StringBuilder errors = new StringBuilder();
+        Map<String, String> invalidFields = new HashMap<>();
 
-        // Sprawdzamy tylko czy wartości są dodatnie
         if (systolic <= 0) {
-            errors.append("Ciśnienie górne musi być dodatnie\n");
+            invalidFields.put("ciśnienie górne", String.valueOf(systolic));
         }
         if (diastolic <= 0) {
-            errors.append("Ciśnienie dolne musi być dodatnie\n");
+            invalidFields.put("ciśnienie dolne", String.valueOf(diastolic));
         }
         if (pulse <= 0) {
-            errors.append("Puls musi być dodatni\n");
+            invalidFields.put("puls", String.valueOf(pulse));
         }
 
-        if (errors.length() > 0) {
-            throw new ValidationException(errors.toString().trim(), systolic, diastolic, pulse);
+        if (!invalidFields.isEmpty()) {
+            String message = "Następujące wartości są nieprawidłowe (muszą być dodatnie):\n" +
+                    formatInvalidFields(invalidFields);
+            throw new ValidationException(invalidFields, message);
         }
+    }
+
+    private static String formatInvalidFields(Map<String, String> invalidFields) {
+        StringBuilder sb = new StringBuilder();
+        invalidFields.forEach((field, value) ->
+                sb.append(field).append(": ").append(value).append("\n"));
+        return sb.toString().trim();
     }
 }

@@ -1,5 +1,6 @@
 package FileOperation;
 
+import Interfaces.FileExporter;
 import Measure.Measurement;
 import Exceptions.FileOperationException;
 import java.io.*;

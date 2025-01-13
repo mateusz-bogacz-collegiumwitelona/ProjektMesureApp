@@ -2,7 +2,7 @@ package GUI;
 
 import Measure.Measurement;
 import FileOperation.CVEStorage;
-import FileOperation.MeasurementStorage;
+import Interfaces.MeasurementStorage;
 import Exceptions.FileOperationException;
 
 import javax.swing.*;
@@ -18,6 +18,11 @@ public class ViewMeasurementsFrame extends AbstractFrame {
     private List<Measurement> measurements;
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
+
+    private JButton sortButton;
+    private JComboBox<String> sortOptions;
+    private JButton avgButton;
+    private JButton closeButton;
 
     public ViewMeasurementsFrame() {
         super("Lista pomiarów");
@@ -44,24 +49,22 @@ public class ViewMeasurementsFrame extends AbstractFrame {
         JScrollPane scrollPane = new JScrollPane(table);
         addComponent(scrollPane, gbc, 0, 0, 3);
 
-        JButton sortButton = new JButton("Sortuj");
-        JComboBox<String> sortOptions = new JComboBox<>(new String[]{"Górne", "Dolne", "Puls"});
-        JButton avgButton = new JButton("Średnie");
-        JButton closeButton = new JButton("Zamknij");
+        sortButton = new JButton("Sortuj");
+        sortOptions = new JComboBox<>(new String[]{"Górne", "Dolne", "Puls"});
+        avgButton = new JButton("Średnie");
+        closeButton = new JButton("Zamknij");
 
         addComponent(sortButton, gbc, 0, 1, 1);
         addComponent(sortOptions, gbc, 1, 1, 1);
         addComponent(avgButton, gbc, 2, 1, 1);
         addComponent(closeButton, gbc, 1, 2, 1);
-
-        sortButton.addActionListener(e -> sortMeasurements((String)sortOptions.getSelectedItem()));
-        avgButton.addActionListener(e -> showAverages());
-        closeButton.addActionListener(e -> close());
     }
 
     @Override
     protected void setupListeners() {
-        // All listeners are set up in initComponents for this frame
+        sortButton.addActionListener(e -> sortMeasurements((String)sortOptions.getSelectedItem()));
+        avgButton.addActionListener(e -> showAverages());
+        closeButton.addActionListener(e -> close());
     }
 
     private void loadMeasurements() {

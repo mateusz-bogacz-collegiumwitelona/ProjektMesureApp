@@ -1,6 +1,8 @@
 package FileOperation;
 
 import Exceptions.*;
+import Interfaces.MeasureOperations;
+import Interfaces.MeasurementStorage;
 import Measure.*;
 import java.io.*;
 import java.nio.file.Files;
@@ -27,7 +29,7 @@ public class MeasureFileOperations implements MeasureOperations {
 
     @Override
     public synchronized void saveMeasure(String systolic, String diastolic, String pulse)
-            throws EmptyFieldException, InvalidMeasurementValueException,
+            throws EmptyFieldException, ValidationException,
             ValidationException, FileOperationException {
         if (systolic == null || systolic.trim().isEmpty()) {
             throw new EmptyFieldException("ciśnienie górne");
@@ -44,7 +46,7 @@ public class MeasureFileOperations implements MeasureOperations {
             Integer.parseInt(diastolic.trim());
             Integer.parseInt(pulse.trim());
         } catch (NumberFormatException e) {
-            throw new InvalidMeasurementValueException(
+            throw new ValidationException(
                     "wartość",
                     systolic + "," + diastolic + "," + pulse,
                     "Wszystkie wartości muszą być liczbami"
@@ -144,30 +146,32 @@ public class MeasureFileOperations implements MeasureOperations {
 
     @Override
     public synchronized void saveToCustomTXT(File file) throws FileOperationException {
-        List<String[]> measures;
-        try {
-            measures = loadMeasures();
-        } catch (FileOperationException e) {
-            throw new FileOperationException(file.getPath(),
-                    FileOperationException.OperationType.READ,
-                    "Nie udało się odczytać danych do eksportu", e);
-        }
+        // Wczytaj surowe dane
+        List<String[]> rawMeasures = loadMeasures();
+        // Przekonwertuj na obiekty Measurement
+        List<Measurement> measurements = convertToMeasurements(rawMeasures);
+        // Użyj TXTExporter do zapisu
+        TXTExporter exporter = new TXTExporter();
+        exporter.export(measurements, file);
+    }
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            writer.write("Pomiary ciśnienia\n");
-            writer.write("=================\n\n");
-
-            for (String[] measure : measures) {
-                writer.write(String.format("Data: %s\n", measure[0]));
-                writer.write(String.format("Ciśnienie górne: %s\n", measure[1]));
-                writer.write(String.format("Ciśnienie dolne: %s\n", measure[2]));
-                writer.write(String.format("Puls: %s\n", measure[3]));
-                writer.write("-------------------------\n");
+    private List<Measurement> convertToMeasurements(List<String[]> rawMeasures) throws FileOperationException {
+        List<Measurement> measurements = new ArrayList<>();
+        for (String[] measure : rawMeasures) {
+            try {
+                Measurement measurement = new MeasurementBuilder()
+                        .withTimestamp(LocalDateTime.parse(measure[0], dateFormatter))
+                        .withSystolic(Integer.parseInt(measure[1]))
+                        .withDiastolic(Integer.parseInt(measure[2]))
+                        .withPulse(Integer.parseInt(measure[3]))
+                        .build();
+                measurements.add(measurement);
+            } catch (Exception e) {
+                throw new FileOperationException(cveFilePath,
+                        FileOperationException.OperationType.READ,
+                        "Błąd podczas konwersji danych: " + e.getMessage(), e);
             }
-        } catch (IOException e) {
-            throw new FileOperationException(file.getPath(),
-                    FileOperationException.OperationType.WRITE,
-                    "Błąd podczas zapisu do pliku TXT", e);
         }
+        return measurements;
     }
 }

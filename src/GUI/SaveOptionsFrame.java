@@ -1,7 +1,7 @@
 package GUI;
 
 import FileOperation.CVEStorage;
-import FileOperation.MeasurementStorage;
+import Interfaces.MeasurementStorage;
 import FileOperation.CVEExporter;
 import FileOperation.TXTExporter;
 import Exceptions.FileOperationException;
@@ -13,6 +13,9 @@ import java.io.File;
 public class SaveOptionsFrame extends AbstractFrame {
     private final MeasurementStorage storage;
     private final JFileChooser fileChooser;
+    private JButton cveButton;
+    private JButton txtButton;
+    private JButton closeButton;
 
     public SaveOptionsFrame() {
         super("Opcje zapisu");
@@ -28,22 +31,20 @@ public class SaveOptionsFrame extends AbstractFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        JButton cveButton = new JButton("Zapisz do CVE");
-        JButton txtButton = new JButton("Zapisz do TXT");
-        JButton closeButton = new JButton("Zamknij");
+        cveButton = new JButton("Zapisz do CVE");
+        txtButton = new JButton("Zapisz do TXT");
+        closeButton = new JButton("Zamknij");
 
         addComponent(cveButton, gbc, 0, 0, 1);
         addComponent(txtButton, gbc, 1, 0, 1);
         addComponent(closeButton, gbc, 0, 1, 2);
-
-        cveButton.addActionListener(e -> saveToCVE());
-        txtButton.addActionListener(e -> saveToTXT());
-        closeButton.addActionListener(e -> close());
     }
 
     @Override
     protected void setupListeners() {
-        // All listeners are set up in initComponents for this frame
+        cveButton.addActionListener(e -> saveToCVE());
+        txtButton.addActionListener(e -> saveToTXT());
+        closeButton.addActionListener(e -> close());
     }
 
     private void saveToCVE() {
