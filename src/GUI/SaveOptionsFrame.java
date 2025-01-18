@@ -33,18 +33,15 @@ public class SaveOptionsFrame extends AbstractFrame {
 
         cveButton = new JButton("Zapisz do CVE");
         txtButton = new JButton("Zapisz do TXT");
-        closeButton = new JButton("Zamknij");
 
         addComponent(cveButton, gbc, 0, 0, 1);
         addComponent(txtButton, gbc, 1, 0, 1);
-        addComponent(closeButton, gbc, 0, 1, 2);
     }
 
     @Override
     protected void setupListeners() {
         cveButton.addActionListener(e -> saveToCVE());
         txtButton.addActionListener(e -> saveToTXT());
-        closeButton.addActionListener(e -> close());
     }
 
     private void saveToCVE() {

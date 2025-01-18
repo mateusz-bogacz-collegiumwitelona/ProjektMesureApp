@@ -37,10 +37,8 @@ public class AddMeasurementFrame extends AbstractFrame {
         addLabelAndField("Puls:", pulseField, gbc, 2);
 
         saveButton = new JButton("Zapisz");
-        closeButton = new JButton("Zamknij");
 
         addComponent(saveButton, gbc, 0, 3, 1);
-        addComponent(closeButton, gbc, 1, 3, 1);
     }
 
     private void addLabelAndField(String labelText, JTextField field, GridBagConstraints gbc, int row) {
@@ -52,7 +50,6 @@ public class AddMeasurementFrame extends AbstractFrame {
     @Override
     protected void setupListeners() {
         saveButton.addActionListener(e -> saveMeasurement());
-        closeButton.addActionListener(e -> close());
 
         systolicField.addActionListener(e -> diastolicField.requestFocus());
         diastolicField.addActionListener(e -> pulseField.requestFocus());

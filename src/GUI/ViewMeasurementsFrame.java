@@ -52,19 +52,16 @@ public class ViewMeasurementsFrame extends AbstractFrame {
         sortButton = new JButton("Sortuj");
         sortOptions = new JComboBox<>(new String[]{"Górne", "Dolne", "Puls"});
         avgButton = new JButton("Średnie");
-        closeButton = new JButton("Zamknij");
 
         addComponent(sortButton, gbc, 0, 1, 1);
         addComponent(sortOptions, gbc, 1, 1, 1);
         addComponent(avgButton, gbc, 2, 1, 1);
-        addComponent(closeButton, gbc, 1, 2, 1);
     }
 
     @Override
     protected void setupListeners() {
         sortButton.addActionListener(e -> sortMeasurements((String)sortOptions.getSelectedItem()));
         avgButton.addActionListener(e -> showAverages());
-        closeButton.addActionListener(e -> close());
     }
 
     private void loadMeasurements() {
