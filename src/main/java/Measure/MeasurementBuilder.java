@@ -54,7 +54,6 @@ public class MeasurementBuilder {
         }
     }
 
-    // Gettery dla klasy Measurement
     LocalDateTime getTimestamp() { return timestamp; }
     int getSystolic() { return systolic; }
     int getDiastolic() { return diastolic; }
