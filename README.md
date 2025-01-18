@@ -1,6 +1,6 @@
-#Projekt zaliczniowy na przedmiot Projektowanie i programowanie obiektowe
+# Projekt zaliczeniowy na przedmiot Projektowanie i programowanie obiektowe
 
-#Jest to prosta aplikacja do monitorowania ciśnienia tętniczego. 
+Jest to prosta aplikacja do monitorowania ciśnienia tętniczego.
 
 # Dokumentacja Aplikacji Bieda Ciśnienie
 
@@ -360,7 +360,11 @@ Interfejs operacji na pomiarach.
 - **saveToCustomCVE(File file)**
 - **saveToCustomTXT(File file)**
 
+---
 
+Wykonali:
+- Mateusz Bogacz-Drewniak
+- Michał Żmuda 
+- Mateusz Chimkowski
 
-Wykonali : Mateusz Bogacz-Drewniak, Michał Żmuda, Mateusz Chimkowski 
-Collegium Witelona Uczelnia Państwowa 2025
+*Collegium Witelona Uczelnia Państwowa, 2025*
