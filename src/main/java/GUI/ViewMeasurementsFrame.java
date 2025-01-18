@@ -19,10 +19,10 @@ public class ViewMeasurementsFrame extends AbstractFrame {
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
-    private JButton sortButton;
     private JComboBox<String> sortOptions;
     private JButton avgButton;
-    private JButton closeButton;
+
+
 
     public ViewMeasurementsFrame() {
         super("Lista pomiarów");
@@ -49,20 +49,24 @@ public class ViewMeasurementsFrame extends AbstractFrame {
         JScrollPane scrollPane = new JScrollPane(table);
         addComponent(scrollPane, gbc, 0, 0, 3);
 
-        sortButton = new JButton("Sortuj");
-        sortOptions = new JComboBox<>(new String[]{"Górne", "Dolne", "Puls"});
-        avgButton = new JButton("Średnie");
+        this.sortOptions = MainFrame.createBJComboBox("Sortuj");
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(new String[]{"Sortuj", "Górne", "Dolne", "Puls"});
+        sortOptions.setModel(model);
 
-        addComponent(sortButton, gbc, 0, 1, 1);
+        avgButton = createButton("Średnie");
+
         addComponent(sortOptions, gbc, 1, 1, 1);
-        addComponent(avgButton, gbc, 2, 1, 1);
+        addComponent(avgButton, gbc, 1, 2, 1);
     }
 
     @Override
     protected void setupListeners() {
-        sortButton.addActionListener(e -> sortMeasurements((String)sortOptions.getSelectedItem()));
         avgButton.addActionListener(e -> showAverages());
+
+        // Dodajemy nasłuchiwacz do zmiany wyboru w JComboBox
+        sortOptions.addActionListener(e -> sortMeasurements((String) sortOptions.getSelectedItem()));
     }
+
 
     private void loadMeasurements() {
         try {

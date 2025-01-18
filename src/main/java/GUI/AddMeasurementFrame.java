@@ -38,7 +38,7 @@ public class AddMeasurementFrame extends AbstractFrame {
         addLabelAndField("Dolne:", diastolicField, gbc, 1);
         addLabelAndField("Puls:", pulseField, gbc, 2);
 
-        saveButton = new JButton("Zapisz");
+        saveButton = createButton("Zapisz");
 
         addComponent(saveButton, gbc, 0, 3, 1);
     }

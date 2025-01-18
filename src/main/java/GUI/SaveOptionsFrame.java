@@ -31,8 +31,8 @@ public class SaveOptionsFrame extends AbstractFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        cveButton = new JButton("Zapisz do CVE");
-        txtButton = new JButton("Zapisz do TXT");
+        cveButton = createButton("Zapisz do CVE");
+        txtButton = createButton("Zapisz do TXT");
 
         addComponent(cveButton, gbc, 0, 0, 1);
         addComponent(txtButton, gbc, 1, 0, 1);
