@@ -35,7 +35,7 @@ public class SaveOptionsFrame extends AbstractFrame {
         txtButton = createButton("Zapisz do TXT");
 
         addComponent(cveButton, gbc, 0, 0, 1);
-        addComponent(txtButton, gbc, 1, 0, 1);
+        addComponent(txtButton, gbc, 0, 1, 1);
     }
 
     @Override

@@ -56,7 +56,7 @@ public class ViewMeasurementsFrame extends AbstractFrame {
         avgButton = createButton("Średnie");
 
         addComponent(sortOptions, gbc, 1, 1, 1);
-        addComponent(avgButton, gbc, 1, 2, 1);
+        addComponent(avgButton, gbc, 2, 1, 1);
     }
 
     @Override
