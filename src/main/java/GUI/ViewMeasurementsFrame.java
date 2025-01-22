@@ -99,7 +99,7 @@ public class ViewMeasurementsFrame extends AbstractFrame {
         switch (criteria) {
             case "Data":
                 measurements = measurements.stream()
-                        .sorted((m1, m2) -> m1.getTimestamp().compareTo(m2.getTimestamp()))
+                        .sorted((m1, m2) -> m2.getTimestamp().compareTo(m1.getTimestamp()))  // Tu jest zmiana
                         .collect(Collectors.toList());
                 break;
             case "Górne":
