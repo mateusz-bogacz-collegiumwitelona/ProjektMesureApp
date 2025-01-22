@@ -83,18 +83,24 @@ public class MainFrame extends AbstractFrame {
     protected JButton createButton(String text) {
         JButton button = new JButton(text);
 
-        // Usunięcie domyślnych stylów, które mogą powodować białe tło
+        // Usunięcie domyślnych stylów
         button.setContentAreaFilled(false);
-        button.setOpaque(true); // Ustawia kolor tła przycisku
-        button.setBorderPainted(false); // Usunięcie domyślnej obwódki
+        button.setOpaque(true);
+        button.setBorderPainted(false);
 
-        button.setPreferredSize(new Dimension(200, 40));
+        // Stały rozmiar dla wszystkich przycisków
+        int buttonWidth = 200; // szerokość w pikselach
+        int buttonHeight = 50; // wysokość w pikselach
+        button.setPreferredSize(new Dimension(buttonWidth, buttonHeight));
+        button.setMaximumSize(new Dimension(buttonWidth, buttonHeight));
+        button.setMinimumSize(new Dimension(buttonWidth, buttonHeight));
+
         button.setBackground(new Color(30, 144, 255)); // Niebieskie tło
         button.setForeground(Color.WHITE); // Biały tekst
         button.setFont(new Font("SansSerif", Font.BOLD, 16));
-        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); // Dodatkowy margines wewnętrzny
+        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
-        // Dodanie prostego efektu hover
+        // Efekt hover
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -103,12 +109,13 @@ public class MainFrame extends AbstractFrame {
 
             @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(30, 144, 255)); // Powrót do jasnoniebieskiego
+                button.setBackground(new Color(30, 144, 255)); // Jasnoniebieski
             }
         });
 
         return button;
     }
+
 
     // W klasie MainFrame:
     public static JComboBox<String> createBJComboBox(String text) {
