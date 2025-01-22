@@ -1,370 +1,163 @@
-# Projekt zaliczeniowy na przedmiot Projektowanie i programowanie obiektowe
+# Dokumentacja Programu "Bieda Ciśnienie"
 
-Jest to prosta aplikacja do monitorowania ciśnienia tętniczego.
+Bieda Ciśnienie to aplikacja do monitorowania ciśnienia krwi. Pozwala na zapisywanie, przeglądanie i analizowanie pomiarów ciśnienia oraz eksport danych.
 
-# Dokumentacja Aplikacji Bieda Ciśnienie
+## 1. Struktura Projektu
 
-## Spis treści
-1. [Wprowadzenie](#wprowadzenie)
-2. [Architektura Systemu](#architektura-systemu)
-3. [Główne Funkcjonalności](#główne-funkcjonalności)
-4. [Struktura Projektu](#struktura-projektu)
-5. [Szczegóły Implementacji](#szczegóły-implementacji)
-6. [Obsługa Błędów](#obsługa-błędów)
-7. [Format Plików](#format-plików)
-8. [Interfejs Użytkownika](#interfejs-użytkownika)
+### 1.1 Pakiety
+- `GUI` - Zawiera komponenty interfejsu użytkownika
+- `Measure` - Zawiera klasy związane z pomiarami ciśnienia
+- `Exceptions` - Zawiera klasy wyjątków
+- `FileOperation` - Zawiera klasy odpowiedzialne za operacje na plikach
+- `Interfaces` - Zawiera interfejsy definiujące kontrakty
 
-## Wprowadzenie
-Bieda Ciśnienie to aplikacja desktopowa napisana w Java/Swing, służąca do monitorowania i analizy pomiarów ciśnienia krwi. Program umożliwia użytkownikom zapisywanie, przeglądanie i analizowanie pomiarów ciśnienia oraz eksportowanie danych do różnych formatów plików.
+## 2. Główne Komponenty
 
-### Główne cechy
-- Zapisywanie pomiarów ciśnienia (górnego, dolnego) i pulsu
-- Przeglądanie historii pomiarów
-- Sortowanie i analiza danych
-- Eksport danych do formatów CVE i TXT
-- Intuicyjny interfejs graficzny
+### 2.1 Klasa Main
+**Plik**: `Main.java`
+- Punkt wejściowy aplikacji
+- Konfiguruje wygląd systemowy (Look and Feel)
+- Uruchamia główne okno aplikacji w bezpiecznym wątku EDT (Event Dispatch Thread)
 
-## Architektura Systemu
+### 2.2 Model Danych
 
-### Wzorce projektowe
-1. **Builder Pattern**
-   - Implementacja: `MeasurementBuilder`
-   - Cel: Bezpieczne tworzenie obiektów `Measurement`
+#### 2.2.1 Klasa Measurement
+**Plik**: `Measurement.java`
+- Reprezentuje pojedynczy pomiar ciśnienia
+- **Pola**:
+  - `timestamp` - Data i czas pomiaru (LocalDateTime)
+  - `systolic` - Ciśnienie górne (int)
+  - `diastolic` - Ciśnienie dolne (int)
+  - `pulse` - Puls (int)
+- Implementuje wzorzec Builder poprzez MeasurementBuilder
 
-2. **Factory Pattern**
-   - Implementacja: `FrameFactory`
-   - Cel: Tworzenie różnych typów okien aplikacji
+#### 2.2.2 Klasa MeasurementBuilder
+**Plik**: `MeasurementBuilder.java`
+- Implementuje wzorzec projektowy Builder
+- **Metody**:
+  - `withTimestamp()` - Ustawia datę pomiaru
+  - `withSystolic()` - Ustawia ciśnienie górne
+  - `withDiastolic()` - Ustawia ciśnienie dolne
+  - `withPulse()` - Ustawia puls
+  - `build()` - Tworzy i waliduje obiekt Measurement
+- **Walidacja**:
+  - Sprawdza czy wszystkie wartości są dodatnie
+  - Zgłasza ValidationException w przypadku błędnych danych
 
-3. **Interface Segregation**
-   - Implementacja: `FileExporter`, `MeasurementStorage`, `MeasureOperations`
-   - Cel: Rozdzielenie odpowiedzialności i ułatwienie rozszerzania funkcjonalności
+### 2.3 Interfejsy
 
-### Hierarchia klas
-```
-AbstractFrame
-├── MainFrame
-├── AddMeasurementFrame
-├── ViewMeasurementsFrame
-└── SaveOptionsFrame
+#### 2.3.1 FileExporter
+**Plik**: `FileExporter.java`
+- Definiuje kontrakt dla eksportu pomiarów do plików
+- **Metody**:
+  - `export()` - Eksportuje listę pomiarów do pliku
 
-MeasurementException
-├── ValidationException
-│   └── EmptyFieldException
-└── FileOperationException
-```
+#### 2.3.2 MeasurementStorage
+**Plik**: `MeasurementStorage.java`
+- Definiuje kontrakt dla przechowywania pomiarów
+- **Metody**:
+  - `save()` - Zapisuje pojedynczy pomiar
+  - `loadAll()` - Wczytuje wszystkie pomiary
+  - `exportTo()` - Eksportuje pomiary do pliku
 
-## Główne Funkcjonalności
+### 2.4 Operacje na Plikach
 
-### 1. Zarządzanie pomiarami
-- **Dodawanie pomiarów**
-  - Klasa: `AddMeasurementFrame`
-  - Walidacja danych wejściowych
-  - Automatyczne zapisywanie do pliku
+#### 2.4.1 CSVStorage
+**Plik**: `CSVStorage.java`
+- Implementuje MeasurementStorage dla plików CSV
+- Format pliku: data;ciśnienie_górne;ciśnienie_dolne;puls
+- **Obsługa plików**:
+  - Automatyczne tworzenie katalogów
+  - Walidacja danych podczas odczytu
+  - Obsługa błędów I/O
 
-- **Przeglądanie pomiarów**
-  - Klasa: `ViewMeasurementsFrame`
-  - Sortowanie według różnych kryteriów
-  - Obliczanie średnich wartości
+#### 2.4.2 CSVExporter
+**Plik**: `CSVExporter.java`
+- Implementuje FileExporter dla formatu CSV
+- Używa średnika jako separatora
+- Formatuje datę w formacie "dd.MM.yyyy HH:mm:ss"
 
-### 2. Operacje na plikach
-- **Format CVE**
-  - Separator: średnik (;)
-  - Format daty: dd.MM.yyyy HH:mm:ss
-  - Struktura: data;ciśnienie_górne;ciśnienie_dolne;puls
+#### 2.4.3 TXTExporter
+**Plik**: `TXTExporter.java`
+- Implementuje FileExporter dla formatu TXT
+- Generuje czytelny raport tekstowy
+- Dodaje nagłówki i formatowanie
 
-- **Format TXT**
-  - Format czytelny dla człowieka
-  - Zawiera nagłówki i separatory
+### 2.5 Interfejs Użytkownika
 
-## Struktura Projektu
-
-### Pakiety
-1. **GUI**
-   - Zawiera wszystkie klasy interfejsu użytkownika
-   - Bazuje na bibliotece Swing
-
-2. **Measure**
-   - Klasy związane z pomiarami
-   - Implementacja logiki biznesowej
-
-3. **FileOperation**
-   - Obsługa operacji plikowych
-   - Implementacje eksporterów
-
-4. **Exceptions**
-   - Własna hierarchia wyjątków
-   - Obsługa błędów specyficznych dla aplikacji
-
-5. **Interfaces**
-   - Definicje interfejsów
-   - Zapewnienie luźnego powiązania między komponentami
-
-## Szczegóły Implementacji
-
-### Klasy bazowe i interfejsy
-
-#### AbstractFrame
-```java
-protected abstract void initComponents();
-protected abstract void setupListeners();
-```
+#### 2.5.1 AbstractFrame
+**Plik**: `AbstractFrame.java`
 - Bazowa klasa dla wszystkich okien
-- Zapewnia wspólną funkcjonalność UI
+- Definiuje wspólne funkcjonalności:
+  - Tworzenie przycisków
+  - Obsługa błędów
+  - Zarządzanie layoutem
 
-#### MeasurementStorage
-```java
-void save(Measurement measurement);
-List<Measurement> loadAll();
-void exportTo(File file, FileExporter exporter);
-```
-- Interfejs dla operacji przechowywania pomiarów
+#### 2.5.2 MainFrame
+**Plik**: `MainFrame.java`
+- Główne okno aplikacji
+- **Funkcjonalności**:
+  - Panel nawigacyjny
+  - Dynamiczne przełączanie widoków
+  - Spójny styl interfejsu
 
-### Obsługa danych
-
-#### Measurement
-- Niemutowalna klasa reprezentująca pomiar
-- Budowana przez `MeasurementBuilder`
-- Zawiera:
-  - Timestamp
-  - Ciśnienie górne
-  - Ciśnienie dolne
-  - Puls
-
-## Obsługa Błędów
-
-### Hierarchia wyjątków
-1. **MeasurementException**
-   - Bazowa klasa dla wszystkich wyjątków aplikacji
-
-2. **ValidationException**
-   - Błędy walidacji danych
-   - Przechowuje informacje o nieprawidłowych polach
-
-3. **EmptyFieldException**
-   - Specyficzny przypadek ValidationException
-   - Używany gdy pole jest puste
-
-4. **FileOperationException**
-   - Błędy operacji plikowych
-   - Zawiera informacje o typie operacji i ścieżce pliku
-
-## Format Plików
-
-### CVE (Custom Value Export)
-```
-dd.MM.yyyy HH:mm:ss;systolic;diastolic;pulse
-```
-Przykład:
-```
-08.01.2025 20:23:56;354;456;543
-```
-
-### TXT
-```
-Pomiary ciśnienia
-=================
-
-Data: dd.MM.yyyy HH:mm:ss
-Ciśnienie górne: XXX
-Ciśnienie dolne: XXX
-Puls: XXX
--------------------------
-```
-
-## Interfejs Użytkownika
-
-### Główne komponenty
-
-#### MainFrame
-- Menu główne aplikacji
-- Nawigacja między funkcjami
-- Ciemny motyw kolorystyczny
-
-#### AddMeasurementFrame
-- Formularz dodawania pomiarów
-- Walidacja w czasie rzeczywistym
+#### 2.5.3 AddMeasurementFrame
+**Plik**: `AddMeasurementFrame.java`
+- Formularz dodawania nowego pomiaru
+- Walidacja wprowadzanych danych
 - Automatyczne przechodzenie między polami
 
-#### ViewMeasurementsFrame
-- Tabela pomiarów
-- Opcje sortowania
-- Obliczanie statystyk
+#### 2.5.4 ViewMeasurementsFrame
+**Plik**: `ViewMeasurementsFrame.java`
+- Wyświetla tabelę pomiarów
+- Umożliwia sortowanie
+- Oblicza średnie wartości
 
-#### SaveOptionsFrame
-- Wybór formatu eksportu
-- Wybór lokalizacji pliku
-- Potwierdzenie zapisu
+#### 2.5.5 SaveOptionsFrame
+**Plik**: `SaveOptionsFrame.java`
+- Opcje eksportu danych
+- Obsługa wyboru pliku
+- Obsługa różnych formatów zapisu
 
-### Stylizacja
-- Ciemny motyw
-- Niebieskie akcenty
-- Responsywny układ
-- Intuicyjna nawigacja
+### 2.6 System Wyjątków
 
-## Szczegółowy opis klas i funkcji
+#### 2.6.1 MeasurementException
+**Plik**: `MeasurementException.java`
+- Bazowy wyjątek dla błędów związanych z pomiarami
 
-### Pakiet GUI
+#### 2.6.2 ValidationException
+**Plik**: `ValidationException.java`
+- Wyjątek dla błędów walidacji
+- Przechowuje informacje o nieprawidłowych polach
 
-#### AbstractFrame
-Abstrakcyjna klasa bazowa dla wszystkich okien aplikacji.
-- **Konstruktor(String title)**
-  - Tworzy nowe okno z podanym tytułem
-  - Inicjalizuje podstawowe ustawienia okna
-- **createButton(String text)**
-  - Tworzy przycisk z zadanym tekstem i stylizacją
-  - Dodaje efekty hover
-- **showError(String title, String message)**
-  - Wyświetla okno dialogowe z błędem
-- **showSuccess(String message)**
-  - Wyświetla okno dialogowe z sukcesem
-- **addComponent()**
-  - Dodaje komponenty do układu GridBag
-- **show()**
-  - Wyświetla okno
-- **close()**
-  - Zamyka okno
+#### 2.6.3 FileOperationException
+**Plik**: `FileOperationException.java`
+- Wyjątek dla błędów operacji na plikach
+- Zawiera informacje o typie operacji i ścieżce pliku
 
-#### MainFrame
-Główne okno aplikacji.
-- **initComponents()**
-  - Inicjalizuje wszystkie komponenty UI
-  - Ustawia ciemny motyw
-  - Tworzy menu nawigacyjne
-- **setupListeners()**
-  - Konfiguruje obsługę przycisków nawigacji
-- **createButton(String text)**
-  - Przeciążona metoda tworzenia stylizowanych przycisków
-- **createBJComboBox(String text)**
-  - Tworzy stylizowane rozwijane menu
+#### 2.6.4 EmptyFieldException
+**Plik**: `EmptyFieldException.java`
+- Wyjątek dla pustych pól formularza
 
-#### AddMeasurementFrame
-Okno dodawania nowego pomiaru.
-- **initComponents()**
-  - Tworzy formularz z polami wprowadzania
-- **setupListeners()**
-  - Konfiguruje obsługę przycisków i pól
-- **saveMeasurement()**
-  - Waliduje i zapisuje nowy pomiar
-- **validateFields()**
-  - Sprawdza poprawność wprowadzonych danych
-- **createMeasurement()**
-  - Tworzy obiekt pomiaru z wprowadzonych danych
-- **clearFields()**
-  - Czyści pola formularza
+## 3. Format Pliku CSV
+- Separator: średnik (;)
+- Kolumny:
+  1. Data i czas (dd.MM.yyyy HH:mm:ss)
+  2. Ciśnienie górne (liczba całkowita)
+  3. Ciśnienie dolne (liczba całkowita)
+  4. Puls (liczba całkowita)
 
-#### ViewMeasurementsFrame
-Okno przeglądania pomiarów.
-- **initComponents()**
-  - Tworzy tabelę pomiarów i kontrolki
-- **setupListeners()**
-  - Konfiguruje obsługę sortowania i filtrowania
-- **loadMeasurements()**
-  - Wczytuje pomiary z pliku
-- **updateTable()**
-  - Aktualizuje widok tabeli
-- **sortMeasurements(String criteria)**
-  - Sortuje pomiary według wybranego kryterium
-- **showAverages()**
-  - Oblicza i wyświetla średnie wartości
+## 4. Wzorce Projektowe
+1. Builder (MeasurementBuilder)
+2. Factory (FrameFactory)
+3. Singleton (ViewMeasurementsFrame)
+4. Strategy (FileExporter)
+5. Template Method (AbstractFrame)
 
-#### SaveOptionsFrame
-Okno opcji zapisu.
-- **initComponents()**
-  - Tworzy przyciski eksportu
-- **setupListeners()**
-  - Konfiguruje obsługę eksportu
-- **saveToCVE()**
-  - Eksportuje dane do formatu CVE
-- **saveToTXT()**
-  - Eksportuje dane do formatu TXT
+## 5. Autorzy
 
-### Pakiet Measure
-
-#### Measurement
-Klasa reprezentująca pojedynczy pomiar.
-- **Konstruktor(MeasurementBuilder builder)**
-  - Tworzy niemutowalny obiekt pomiaru
-- **getTimestamp()/getSystolic()/getDiastolic()/getPulse()**
-  - Gettery dla wartości pomiaru
-- **toString()**
-  - Formatuje pomiar do postaci tekstowej
-
-#### MeasurementBuilder
-Builder do tworzenia obiektów Measurement.
-- **withTimestamp()/withSystolic()/withDiastolic()/withPulse()**
-  - Metody ustawiające wartości
-- **build()**
-  - Tworzy i waliduje obiekt Measurement
-- **validate()**
-  - Sprawdza poprawność wszystkich wartości
-
-### Pakiet FileOperation
-
-#### CVEStorage
-Implementacja zapisu/odczytu w formacie CVE.
-- **save(Measurement measurement)**
-  - Zapisuje pojedynczy pomiar
-- **loadAll()**
-  - Wczytuje wszystkie pomiary
-- **exportTo(File file, FileExporter exporter)**
-  - Eksportuje dane do wybranego formatu
-- **createDirectoryIfNeeded()**
-  - Tworzy katalog jeśli nie istnieje
-
-#### CVEExporter
-Eksporter do formatu CVE.
-- **export(List<Measurement> measurements, File file)**
-  - Eksportuje listę pomiarów do pliku CVE
-
-#### TXTExporter
-Eksporter do formatu TXT.
-- **export(List<Measurement> measurements, File file)**
-  - Eksportuje listę pomiarów do pliku TXT
-
-### Pakiet Exceptions
-
-#### MeasurementException
-Bazowa klasa wyjątków aplikacji.
-- Konstruktory z message i cause
-
-#### ValidationException
-Wyjątek walidacji danych.
-- **getInvalidFields()**
-  - Zwraca mapę nieprawidłowych pól
-
-#### EmptyFieldException
-Wyjątek pustego pola.
-- Konstruktor przyjmujący nazwę pustego pola
-
-#### FileOperationException
-Wyjątek operacji plikowych.
-- **getFilePath()/getOperationType()**
-  - Zwracają szczegóły błędu operacji
-
-### Pakiet Interfaces
-
-#### MeasurementStorage
-Interfejs przechowywania pomiarów.
-- **save(Measurement measurement)**
-- **loadAll()**
-- **exportTo(File file, FileExporter exporter)**
-
-#### FileExporter
-Interfejs eksportu danych.
-- **export(List<Measurement> measurements, File file)**
-
-#### MeasureOperations
-Interfejs operacji na pomiarach.
-- **saveMeasure(String systolic, String diastolic, String pulse)**
-- **loadMeasures()**
-- **saveToCustomCVE(File file)**
-- **saveToCustomTXT(File file)**
-
----
-
-Wykonali:
-- Mateusz Bogacz-Drewniak
-- Michał Żmuda 
-- Mateusz Chimkowski
+- Mateusz Bogacz-Drewniak ([GitHub](https://github.com/mateusz-bogacz-collegiumwitelona))
+- Mateusz Chimkowski ([GitHub](https://github.com/Chimek006))
+- Michał Żmuda ([GitHub](https://github.com/Sigurvegarinn2000))
 
 *Collegium Witelona Uczelnia Państwowa, 2025*

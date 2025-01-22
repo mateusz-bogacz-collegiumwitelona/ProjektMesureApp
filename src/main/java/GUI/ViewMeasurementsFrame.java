@@ -1,7 +1,7 @@
 package GUI;
 
 import Measure.Measurement;
-import FileOperation.CVEStorage;
+import FileOperation.CSVStorage;
 import Interfaces.MeasurementStorage;
 import Exceptions.FileOperationException;
 
@@ -24,7 +24,7 @@ public class ViewMeasurementsFrame extends AbstractFrame {
 
     public ViewMeasurementsFrame() {
         super("Lista pomiarów");
-        this.storage = new CVEStorage();
+        this.storage = new CSVStorage();
         initComponents();
         setupListeners();
         loadMeasurements();

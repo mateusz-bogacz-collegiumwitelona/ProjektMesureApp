@@ -5,7 +5,7 @@ import Exceptions.MeasurementException;
 import Exceptions.ValidationException;
 import Measure.Measurement;
 import Measure.MeasurementBuilder;
-import FileOperation.CVEStorage;
+import FileOperation.CSVStorage;
 import Interfaces.MeasurementStorage;
 
 import javax.swing.*;
@@ -21,7 +21,7 @@ public class AddMeasurementFrame extends AbstractFrame {
 
     public AddMeasurementFrame(ViewMeasurementsFrame viewFrame) {
         super("Dodaj pomiar");
-        this.storage = new CVEStorage();
+        this.storage = new CSVStorage();
         this.systolicField = new JTextField(10);
         this.diastolicField = new JTextField(10);
         this.pulseField = new JTextField(10);

@@ -1,8 +1,8 @@
 package GUI;
 
-import FileOperation.CVEStorage;
+import FileOperation.CSVStorage;
 import Interfaces.MeasurementStorage;
-import FileOperation.CVEExporter;
+import FileOperation.CSVExporter;
 import FileOperation.TXTExporter;
 import Exceptions.FileOperationException;
 
@@ -13,13 +13,13 @@ import java.io.File;
 public class SaveOptionsFrame extends AbstractFrame {
     private final MeasurementStorage storage;
     private final JFileChooser fileChooser;
-    private JButton cveButton;
+    private JButton csvButton;
     private JButton txtButton;
     private JButton closeButton;
 
     public SaveOptionsFrame() {
         super("Opcje zapisu");
-        this.storage = new CVEStorage();
+        this.storage = new CSVStorage();
         this.fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
         initComponents();
@@ -31,26 +31,26 @@ public class SaveOptionsFrame extends AbstractFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        cveButton = createButton("Zapisz do CVE");
+        csvButton = createButton("Zapisz do CSV");
         txtButton = createButton("Zapisz do TXT");
 
-        addComponent(cveButton, gbc, 0, 0, 1);
+        addComponent(csvButton, gbc, 0, 0, 1);
         addComponent(txtButton, gbc, 0, 1, 1);
     }
 
     @Override
     protected void setupListeners() {
-        cveButton.addActionListener(e -> saveToCVE());
+        csvButton.addActionListener(e -> saveToCSV());
         txtButton.addActionListener(e -> saveToTXT());
     }
 
-    private void saveToCVE() {
-        fileChooser.setSelectedFile(new File("measure.cve"));
+    private void saveToCSV() {
+        fileChooser.setSelectedFile(new File("measure.csv"));
         if (fileChooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
-            File file = ensureExtension(fileChooser.getSelectedFile(), ".cve");
+            File file = ensureExtension(fileChooser.getSelectedFile(), ".csv");
             try {
-                storage.exportTo(file, new CVEExporter());
-                showSuccess("Dane zostały zapisane do pliku CVE!");
+                storage.exportTo(file, new CSVExporter());
+                showSuccess("Dane zostały zapisane do pliku CSV!");
             } catch (FileOperationException ex) {
                 showError("Błąd zapisu", ex.getMessage());
             }

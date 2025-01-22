@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MeasureFileOperations implements MeasureOperations {
-    private final String cveFilePath;
-    private static final String DEFAULT_FILE_PATH = "measure.cve";
+    private final String csvFilePath;
+    private static final String DEFAULT_FILE_PATH = "measure.csv";
     private static final String DATE_FORMAT = "dd.MM.yyyy HH:mm:ss";
     private static final String CSV_DELIMITER = ";";
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
@@ -27,13 +27,12 @@ public class MeasureFileOperations implements MeasureOperations {
     }
 
     public MeasureFileOperations(String filePath) {
-        this.cveFilePath = filePath;
+        this.csvFilePath = filePath;
     }
 
     @Override
     public synchronized void saveMeasure(String systolic, String diastolic, String pulse)
-            throws EmptyFieldException, ValidationException,
-            ValidationException, FileOperationException {
+            throws EmptyFieldException, ValidationException, FileOperationException {
         if (systolic == null || systolic.trim().isEmpty()) {
             throw new EmptyFieldException("ciśnienie górne");
         }
@@ -57,17 +56,17 @@ public class MeasureFileOperations implements MeasureOperations {
         }
 
         try {
-            saveToCVE(systolic, diastolic, pulse);
+            saveToCSV(systolic, diastolic, pulse);
         } catch (IOException e) {
-            throw new FileOperationException(cveFilePath,
+            throw new FileOperationException(csvFilePath,
                     FileOperationException.OperationType.WRITE,
                     "Nie udało się zapisać pomiaru", e);
         }
     }
 
-    private void saveToCVE(String systolic, String diastolic, String pulse)
+    private void saveToCSV(String systolic, String diastolic, String pulse)
             throws IOException, FileOperationException {
-        File file = new File(cveFilePath);
+        File file = new File(csvFilePath);
         boolean isNewFile = !file.exists();
 
         if (isNewFile) {
@@ -101,11 +100,11 @@ public class MeasureFileOperations implements MeasureOperations {
     @Override
     public synchronized List<String[]> loadMeasures() throws FileOperationException {
         List<String[]> measures = new ArrayList<>();
-        if (!Files.exists(Paths.get(cveFilePath))) {
+        if (!Files.exists(Paths.get(csvFilePath))) {
             return measures;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(cveFilePath))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(csvFilePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 measures.add(line.split(CSV_DELIMITER));
@@ -113,7 +112,7 @@ public class MeasureFileOperations implements MeasureOperations {
             return measures;
         } catch (IOException e) {
             throw new FileOperationException(
-                    cveFilePath,
+                    csvFilePath,
                     FileOperationException.OperationType.READ,
                     "Błąd podczas odczytu pliku z pomiarami",
                     e
@@ -122,11 +121,15 @@ public class MeasureFileOperations implements MeasureOperations {
     }
 
     public String getFilePath() {
-        return cveFilePath;
+        return csvFilePath;
     }
 
     @Override
     public synchronized void saveToCustomCVE(File file) throws FileOperationException {
+        saveToCustomCSV(file);
+    }
+
+    public synchronized void saveToCustomCSV(File file) throws FileOperationException {
         List<String[]> measures;
         try {
             measures = loadMeasures();
@@ -143,17 +146,14 @@ public class MeasureFileOperations implements MeasureOperations {
         } catch (IOException e) {
             throw new FileOperationException(file.getPath(),
                     FileOperationException.OperationType.WRITE,
-                    "Błąd podczas zapisu do pliku CVE", e);
+                    "Błąd podczas zapisu do pliku CSV", e);
         }
     }
 
     @Override
     public synchronized void saveToCustomTXT(File file) throws FileOperationException {
-        // Wczytaj surowe dane
         List<String[]> rawMeasures = loadMeasures();
-        // Przekonwertuj na obiekty Measurement
         List<Measurement> measurements = convertToMeasurements(rawMeasures);
-        // Użyj TXTExporter do zapisu
         TXTExporter exporter = new TXTExporter();
         exporter.export(measurements, file);
     }
@@ -170,7 +170,7 @@ public class MeasureFileOperations implements MeasureOperations {
                         .build();
                 measurements.add(measurement);
             } catch (Exception e) {
-                throw new FileOperationException(cveFilePath,
+                throw new FileOperationException(csvFilePath,
                         FileOperationException.OperationType.READ,
                         "Błąd podczas konwersji danych: " + e.getMessage(), e);
             }

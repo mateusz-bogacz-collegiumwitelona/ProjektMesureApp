@@ -7,7 +7,7 @@ import java.io.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public class CVEExporter implements FileExporter {
+public class CSVExporter implements FileExporter {
     private static final String DELIMITER = ";";
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
@@ -28,7 +28,7 @@ public class CVEExporter implements FileExporter {
         } catch (IOException e) {
             throw new FileOperationException(file.getPath(),
                     FileOperationException.OperationType.WRITE,
-                    "Błąd podczas zapisu do pliku CVE", e);
+                    "Błąd podczas zapisu do pliku CSV", e);
         }
     }
 }

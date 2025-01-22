@@ -14,18 +14,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CVEStorage implements MeasurementStorage {
+public class CSVStorage implements MeasurementStorage {
     private final String filePath;
-    private static final String DEFAULT_PATH = "measure.cve";
+    private static final String DEFAULT_PATH = "measure.csv";
     private static final String DELIMITER = ";";
     private static final DateTimeFormatter DATE_FORMATTER =
             DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
-    public CVEStorage() {
+    public CSVStorage() {
         this(DEFAULT_PATH);
     }
 
-    public CVEStorage(String filePath) {
+    public CSVStorage(String filePath) {
         this.filePath = filePath;
     }
 
