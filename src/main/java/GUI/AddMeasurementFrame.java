@@ -16,15 +16,16 @@ public class AddMeasurementFrame extends AbstractFrame {
     private final JTextField diastolicField;
     private final JTextField pulseField;
     private final MeasurementStorage storage;
+    private final ViewMeasurementsFrame viewFrame;
     private JButton saveButton;
-    private JButton closeButton;
 
-    public AddMeasurementFrame() {
+    public AddMeasurementFrame(ViewMeasurementsFrame viewFrame) {
         super("Dodaj pomiar");
         this.storage = new CVEStorage();
         this.systolicField = new JTextField(10);
         this.diastolicField = new JTextField(10);
         this.pulseField = new JTextField(10);
+        this.viewFrame = viewFrame;
         initComponents();
         setupListeners();
     }
@@ -64,6 +65,9 @@ public class AddMeasurementFrame extends AbstractFrame {
             Measurement measurement = createMeasurement();
             storage.save(measurement);
             showSuccess("Pomiar zapisany!");
+            if (viewFrame != null) {
+                viewFrame.refreshData();
+            }
             clearFields();
             systolicField.requestFocus();
         } catch (MeasurementException e) {

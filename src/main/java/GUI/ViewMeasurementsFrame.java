@@ -22,14 +22,21 @@ public class ViewMeasurementsFrame extends AbstractFrame {
     private JComboBox<String> sortOptions;
     private JButton avgButton;
 
-
-
     public ViewMeasurementsFrame() {
         super("Lista pomiarów");
         this.storage = new CVEStorage();
         initComponents();
         setupListeners();
         loadMeasurements();
+    }
+
+    public void refreshData() {
+        try {
+            measurements = storage.loadAll();
+            updateTable();
+        } catch (FileOperationException e) {
+            showError("Błąd odczytu", e.getMessage());
+        }
     }
 
     @Override
@@ -50,7 +57,7 @@ public class ViewMeasurementsFrame extends AbstractFrame {
         addComponent(scrollPane, gbc, 0, 0, 3);
 
         this.sortOptions = MainFrame.createBJComboBox("Sortuj");
-        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(new String[]{"Sortuj", "Górne", "Dolne", "Puls"});
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>(new String[]{"Sortuj", "Data", "Górne", "Dolne", "Puls"});
         sortOptions.setModel(model);
 
         avgButton = createButton("Średnie");
@@ -62,11 +69,8 @@ public class ViewMeasurementsFrame extends AbstractFrame {
     @Override
     protected void setupListeners() {
         avgButton.addActionListener(e -> showAverages());
-
-        // Dodajemy nasłuchiwacz do zmiany wyboru w JComboBox
         sortOptions.addActionListener(e -> sortMeasurements((String) sortOptions.getSelectedItem()));
     }
-
 
     private void loadMeasurements() {
         try {
@@ -88,7 +92,16 @@ public class ViewMeasurementsFrame extends AbstractFrame {
     }
 
     private void sortMeasurements(String criteria) {
+        if (criteria == null || criteria.equals("Sortuj")) {
+            return;
+        }
+
         switch (criteria) {
+            case "Data":
+                measurements = measurements.stream()
+                        .sorted((m1, m2) -> m1.getTimestamp().compareTo(m2.getTimestamp()))
+                        .collect(Collectors.toList());
+                break;
             case "Górne":
                 measurements = measurements.stream()
                         .sorted((m1, m2) -> Integer.compare(m1.getSystolic(), m2.getSystolic()))
